@@ -80,3 +80,82 @@ fun MenuScreen(
         }
     }
 }
+package com.restaurant.billing.ui.screens
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.restaurant.billing.data.model.MenuItem
+import com.restaurant.billing.data.model.OrderItem
+
+@Composable
+fun MenuScreen(
+    menuItems: List<MenuItem>,
+    newItems: List<OrderItem>,
+    onAddItem: (MenuItem) -> Unit,
+    onRemoveItem: (OrderItem) -> Unit,
+    onViewOrder: () -> Unit,
+    onFetchMenu: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        onFetchMenu()
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Menu",
+            fontSize = 24.sp,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(menuItems) { item ->
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(text = item.name, fontSize = 18.sp)
+                            Text(text = "₹${item.price}", fontSize = 16.sp)
+                        }
+                        Button(
+                            onClick = { onAddItem(item) }
+                        ) {
+                            Text("Add")
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (newItems.isNotEmpty()) {
+            Button(
+                onClick = onViewOrder,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            ) {
+                Text("View Order (${newItems.size} items)")
+            }
+        }
+    }
+}

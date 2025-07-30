@@ -1,6 +1,9 @@
+
 package com.restaurant.billing.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,35 +25,45 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
-    val orderViewModel: OrderViewModel = hiltViewModel()
-    NavHost(navController = navController, startDestination = Screen.TableSelection.route) {
+fun RestaurantBillingApp(
+    navController: NavHostController = rememberNavController()
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.TableSelection.route
+    ) {
         composable(Screen.TableSelection.route) {
             TableSelectionScreen(
-                totalTables = 12,
-                onTableSelected = { tableNum ->
-                    navController.navigate(Screen.Menu.createRoute(tableNum))
+                onTableSelected = { tableNumber ->
+                    navController.navigate(Screen.Menu.createRoute(tableNumber))
                 }
             )
         }
+        
         composable(Screen.Menu.route) { backStackEntry ->
-            val tableNumber = backStackEntry.arguments?.getString("tableNumber")?.toIntOrNull() ?: 1
-            orderViewModel.fetchMenu()
-            val menuItems = orderViewModel.menuItems.value
-            var selectedCategory by remember { mutableStateOf<String?>(null) }
+            val tableNumber = backStackEntry.arguments?.getString("tableNumber")?.toInt() ?: 1
+            val orderViewModel: OrderViewModel = hiltViewModel()
+            val menuItems by orderViewModel.menuItems.collectAsState()
+            val newItems by orderViewModel.newItems.collectAsState()
+            
             MenuScreen(
                 menuItems = menuItems,
+                newItems = newItems,
                 onAddItem = { orderViewModel.addItem(it) },
-                selectedCategory = selectedCategory,
-                onCategorySelected = { selectedCategory = it }
+                onRemoveItem = { orderViewModel.removeItem(it) },
+                onViewOrder = {
+                    navController.navigate(Screen.Order.createRoute(tableNumber))
+                },
+                onFetchMenu = { orderViewModel.fetchMenu() }
             )
-            // Navigation to order screen can be triggered by a button in MenuScreen
         }
+        
         composable(Screen.Order.route) { backStackEntry ->
-            val tableNumber = backStackEntry.arguments?.getString("tableNumber")?.toIntOrNull() ?: 1
-            val confirmedItems = orderViewModel.confirmedItems.value
-            val newItems = orderViewModel.newItems.value
+            val tableNumber = backStackEntry.arguments?.getString("tableNumber")?.toInt() ?: 1
+            val orderViewModel: OrderViewModel = hiltViewModel()
+            val confirmedItems by orderViewModel.confirmedItems.collectAsState()
+            val newItems by orderViewModel.newItems.collectAsState()
+            
             OrderScreen(
                 confirmedItems = confirmedItems,
                 newItems = newItems,
