@@ -74,3 +74,63 @@ fun TableSelectionScreen(
         }
     }
 }
+package com.restaurant.billing.ui.screens
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun TableSelectionScreen(
+    totalTables: Int,
+    onTableSelected: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Select Table",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items((1..totalTables).toList()) { tableNumber ->
+                Card(
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .fillMaxWidth(),
+                    onClick = { onTableSelected(tableNumber) },
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF2196F3))
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Table $tableNumber",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

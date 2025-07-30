@@ -29,3 +29,30 @@ data class ApiResponse(val status: String, val message: String?)
 data class SettingsResponse(val status: String, val data: SettingsData?)
 data class SettingsData(val restaurant_name: String, val total_tables: Int)
 data class ItemsRequest(val items: List<OrderItem>)
+package com.restaurant.billing.data.remote
+
+import com.restaurant.billing.data.model.*
+import retrofit2.http.*
+
+interface ApiService {
+    @GET("menu-items")
+    suspend fun getMenuItems(): MenuResponse
+    
+    @POST("orders")
+    suspend fun saveOrder(@Body orderRequest: OrderRequest): OrderResponse
+    
+    @POST("orders/{orderId}/items")
+    suspend fun appendItemsToOrder(
+        @Path("orderId") orderId: Int,
+        @Body itemsRequest: ItemsRequest
+    ): OrderResponse
+    
+    @PUT("orders/{orderId}/complete")
+    suspend fun completeOrder(@Path("orderId") orderId: Int): OrderResponse
+    
+    @GET("orders")
+    suspend fun getOrders(): OrderResponse
+    
+    @GET("orders/{orderId}")
+    suspend fun getOrder(@Path("orderId") orderId: Int): OrderResponse
+}
