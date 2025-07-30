@@ -1,2 +1,14 @@
 [nix]
 channel = "stable-25_05"
+
+[workflows]
+runButton = "Build Android"
+
+[[workflows.workflow]]
+name = "Build Android"
+author = 45749729
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./gradlew assembleDebug"
